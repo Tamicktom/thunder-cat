@@ -1,6 +1,7 @@
 //* Libraries imports
 import { Elysia } from "elysia";
 import { cron, Patterns } from "@elysiajs/cron";
+import { html } from "@elysia/html";
 import type { Database } from "bun:sqlite";
 
 //* Local imports
@@ -8,6 +9,7 @@ import { collectSample, createCollectors, type Collectors } from "./collectors";
 import { insertSample } from "./db/samples";
 import { createHealthRoutes, type HealthState } from "./routes/health";
 import { createSamplesRoutes } from "./routes/samples";
+import { createDashboardRoutes } from "./routes/dashboard";
 
 export type AppOptions = {
   db: Database;
@@ -24,11 +26,13 @@ export function createApp(options: AppOptions) {
   };
 
   let app = new Elysia()
-    .get("/", () => ({
+    .use(html())
+    .get("/api", () => ({
       name: "thunder-cat",
       version: "1.0.0",
-      endpoints: ["/health", "/samples/latest", "/samples"],
+      endpoints: ["/", "/health", "/samples/latest", "/samples"],
     }))
+    .use(createDashboardRoutes(options.db, state))
     .use(createHealthRoutes(options.db, state))
     .use(createSamplesRoutes(options.db));
 

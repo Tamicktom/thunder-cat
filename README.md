@@ -2,7 +2,7 @@
 
 Personal power-monitoring daemon for this machine (AMD Ryzen 9 9950X3D + Intel Arc B580 + AMD iGPU).
 
-It runs in the background, samples sensors every 5 seconds, stores rows in SQLite (`bun:sqlite`), and exposes a small HTTP API for time-series queries / future charts.
+It runs in the background, samples sensors every 5 seconds, stores rows in SQLite (`bun:sqlite`), serves an HTML dashboard, and exposes a small HTTP API for time-series queries.
 
 ## What it collects
 
@@ -74,7 +74,32 @@ cat /sys/class/powercap/intel-rapl:0/energy_uj
 sudo chmod -R a+r /sys/class/powercap/intel-rapl:0
 ```
 
+## Dashboard
+
+Open `http://127.0.0.1:3927/` for the Thunder-Cat dashboard:
+
+- Summary of latest / avg / min / max for power and RAM temperature
+- Date-range presets (`1h`, `6h`, `24h`, `7d`) and a custom from/to form
+- Power and temperature charts for the selected window
+
+Filter query params (unix ms or `datetime-local` strings):
+
+- `from` — range start (default: `to - 1h`)
+- `to` — range end (default: now)
+
+Example:
+
+```bash
+open "http://127.0.0.1:3927/?from=0&to=9999999999999"
+```
+
 ## API
+
+### `GET /api`
+
+```json
+{ "name": "thunder-cat", "version": "1.0.0", "endpoints": ["/", "/health", "/samples/latest", "/samples"] }
+```
 
 ### `GET /health`
 
