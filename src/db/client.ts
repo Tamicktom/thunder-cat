@@ -3,8 +3,9 @@ import { Database } from "bun:sqlite";
 import { mkdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 
-const DEFAULT_DB_PATH = join(process.cwd(), "data", "thunder-cat.sqlite");
-const SCHEMA_PATH = join(import.meta.dir, "schema.sql");
+const ROOT = process.env.THUNDER_CAT_ROOT ?? process.cwd();
+const DEFAULT_DB_PATH = join(ROOT, "data", "thunder-cat.sqlite");
+const SCHEMA_PATH = join(ROOT, "src", "db", "schema.sql");
 
 export type DbClient = Database;
 

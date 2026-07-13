@@ -11,7 +11,8 @@ import { DashboardPage } from "../ui/dashboard";
 
 const ONE_HOUR_MS = 60 * 60 * 1000;
 const UI_LIMIT = 5_000;
-const PUBLIC_DIR = join(import.meta.dir, "../../public");
+const ROOT = process.env.THUNDER_CAT_ROOT ?? process.cwd();
+const PUBLIC_DIR = join(ROOT, "public");
 
 export function parseTimeParam(
   value: string | number | undefined,

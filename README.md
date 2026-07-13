@@ -23,6 +23,8 @@ Coolers / motherboard power are out of scope for v1.
 
 ## Setup
 
+### Development
+
 ```bash
 bun install
 bun run start
@@ -40,16 +42,42 @@ Env overrides:
 
 - `PORT` — HTTP port (default `3927`)
 - `HOST` — bind host (default `127.0.0.1`)
+- `THUNDER_CAT_ROOT` — project root for SQLite, schema, and `public/` assets (default: `cwd`)
 
 SQLite file: `data/thunder-cat.sqlite` (created automatically, gitignored).
+
+### Production / autostart
+
+Compiles a Bun binary, installs the RAPL udev rule (requires `sudo`), and registers a systemd user service that starts at boot:
+
+```bash
+./scripts/setup.sh
+```
+
+Useful commands:
+
+```bash
+./scripts/setup.sh --status      # service + RAPL readability
+./scripts/setup.sh --restart     # rebuild binary and restart
+./scripts/setup.sh --uninstall   # stop service and remove unit + udev rule
+```
+
+Dashboard after install: `http://127.0.0.1:3927/`
+
+```bash
+systemctl --user status thunder-cat
+systemctl --user restart thunder-cat
+```
 
 ## RAPL permissions
 
 Reading `/sys/class/powercap/intel-rapl:*/energy_uj` is often root-only. Without access, CPU watt columns stay `null`.
 
+`./scripts/setup.sh` installs the udev rule automatically (Option A below).
+
 ### Option A — udev rule (recommended)
 
-Create `/etc/udev/rules.d/99-rapl-readable.rules`:
+Create `/etc/udev/rules.d/99-rapl-readable.rules` (also shipped as `scripts/99-rapl-readable.rules`):
 
 ```
 SUBSYSTEM=="powercap", KERNEL=="intel-rapl:*", RUN+="/bin/chmod -R a+r /sys/class/powercap/%k"
@@ -138,4 +166,6 @@ bun test src/utils/power.test.ts
 |--------|---------|
 | `dev` | `bun run --watch src/index.ts` |
 | `start` | `bun run src/index.ts` |
+| `build` | Compile portable binary to `dist/thunder-cat` |
+| `setup` | `./scripts/setup.sh` (binary + RAPL udev + systemd autostart) |
 | `test` | `bun test` |

@@ -1,0 +1,17 @@
+[Unit]
+Description=Thunder-Cat power monitoring daemon
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=__REPO_ROOT__
+ExecStart=__REPO_ROOT__/dist/thunder-cat
+Restart=always
+RestartSec=5
+Environment=NODE_ENV=production
+Environment=HOST=127.0.0.1
+Environment=PORT=3927
+Environment=THUNDER_CAT_ROOT=__REPO_ROOT__
+
+[Install]
+WantedBy=default.target
